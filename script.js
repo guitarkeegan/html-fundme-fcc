@@ -1,5 +1,7 @@
 import {ethers} from "./ethers-5.6.esm.min.js";
-import {abi} from "./constants";
+import {abi, contractAddress} from "./constants.js";
+
+console.log(ethers);
 
 const connectEl = document.querySelector("#connect");
 const fundButtonEl = document.querySelector("#fund-button");
@@ -25,14 +27,35 @@ async function connect(){
 
 }
 
-async function fund(amountToFund){
-    console.log(`Funding with ${amountToFund}`);
+async function fund(){
+    const ethAmount = "0.3"
+    console.log(`Funding with ${ethAmount}`);
     if (typeof window.ethereum !== 'undefined'){
         // provider/connection to chain, signer/wallet, contract's ABI and address
         // metamask is the provider
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         // account is the signer
         const signer = provider.getSigner();
-        // const contract = 
+        const contract = new ethers.Contract(contractAddress, abi, signer);
+        try{
+            const trasactionResponse = await contract.fund({value: ethers.utils.parseEther(ethAmount)});
+            // console.log(`transaction response\n${JSON.stringify(trasactionResponse)}`);
+            await listenForTransactionMine(trasactionResponse, provider);
+        } catch(e){
+            console.log(e);
+        }
+      
     }
+}
+
+function listenForTransactionMine(transactionResponse, provider){
+    console.log(`Mining ${transactionResponse.hash}...`);
+    return new Promise((resolve, reject)=>{
+        provider.once(transactionResponse.hash, function(transactionReceipt){
+            // console.log(`Transaction Receipt\n${JSON.stringify(transactionReceipt)}`);
+            console.log(`Completed with ${transactionReceipt.confirmations} confirmations `);
+            resolve();
+    });
+    })
+    // create a listener for the blockchain
 }
