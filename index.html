@@ -9,7 +9,18 @@
 <body>
     <h1>Welcome to FundMe!</h1>
     <button id="connect">Connect Wallet</button>
+    <div style="margin-top:5px;" class="fund-contols">
     <button id="fund-button">Fund</button>
+    <label for="fund">ETH Amount</label>
+    <input placeholder="0.1" type="text" id="ethAmount"/>
+    <div>
+        <button id="getBalance">Get Balance</button>
+        <p id="balanceDisplay"></p>
+    </div>
+    <div>
+        <button id="withdraw">Withdraw</button>
+    </div>
+</div>
     <script type="module" src="./script.js"></script>
 </body>
 </html>

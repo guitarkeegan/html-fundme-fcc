@@ -5,9 +5,13 @@ console.log(ethers);
 
 const connectEl = document.querySelector("#connect");
 const fundButtonEl = document.querySelector("#fund-button");
+const balanceButtonEl = document.querySelector("#getBalance");
+const withdrawEL = document.querySelector("#withdraw");
 
 connectEl.onclick = connect;
 fundButtonEl.onclick = fund;
+balanceButtonEl.onclick = getBalance;
+withdrawEL.onclick = withdraw;
 
 async function connect(){
     try {
@@ -28,7 +32,7 @@ async function connect(){
 }
 
 async function fund(){
-    const ethAmount = "0.3"
+    const ethAmount = document.querySelector("#ethAmount").value;
     console.log(`Funding with ${ethAmount}`);
     if (typeof window.ethereum !== 'undefined'){
         // provider/connection to chain, signer/wallet, contract's ABI and address
@@ -45,6 +49,37 @@ async function fund(){
             console.log(e);
         }
       
+    }
+}
+
+async function getBalance(){
+    console.log(`Getting balance...`);
+    if (typeof window.ethereum !== 'undefined'){
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        try {
+            const balance = await provider.getBalance(contractAddress);
+            document.querySelector("#balanceDisplay").textContent = `Balance: ${ethers.utils.formatEther(balance)} ETH`;
+            console.log(balance);
+        } catch (e){
+            console.error(e);
+        }
+    }
+}
+
+async function withdraw(){
+    console.log(`Withdrawing funds...`);
+    if (typeof window.ethereum !== undefined){
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        const contract = new ethers.Contract(contractAddress, abi, signer);
+        try{
+            const trasactionResponse = await contract.withdraw();
+            await listenForTransactionMine(trasactionResponse, provider);
+            document.querySelector("#balanceDisplay").textContent = "Withdraw successful!!";
+            console.log("Funds withdrawn!");
+        } catch (e){
+            console.log(e);
+        }
     }
 }
 
